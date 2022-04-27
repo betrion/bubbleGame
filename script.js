@@ -1,15 +1,19 @@
-var nivo = 1;
+var nivo = 0;
 var nivoId = document.querySelector("#nivo");
 nivoId.innerText = nivo;
 var maxNivo = 10;
-var brojKrugovaNivo = [4, 10, 12, 14, 16, 18, 20, 22, 24, 26];
-var vrijemeNivo = 20;
+var brojKrugovaNivo = [6, 10, 12, 14, 16, 18, 20, 22, 24, 26];
+let vrijemeNivo = []; //dat ćemo neko razumno vrijeme za svaki level
+brojKrugovaNivo.forEach((vrijeme) => {
+  vrijemeNivo.push(vrijeme * 2);
+});
+console.log(vrijemeNivo);
 var boje = ["red", "blue", "green", "yellow"];
 var generiraniKrugovi = [];
 var randBoja, novi;
 var pozicijaKlikaZaDrag = [];
 var brojacVremena;
-// let crveni = document.querySelector("#prvi");
+let glavniBotun = document.getElementById("startStop");
 let crveniDimenzije = document.querySelector("#prvi").getBoundingClientRect();
 let plavi = document.querySelector("#drugi").getBoundingClientRect();
 let zeleni = document.querySelector("#treci").getBoundingClientRect();
@@ -17,19 +21,23 @@ let zuti = document.querySelector("#cetvrti").getBoundingClientRect();
 
 function zapocniIgru() {
   promijeniBotun();
+  ocistiKrugove();
+
+  // promijeniNivo();
   generirajKrugoveNaRandomMjestima(brojKrugovaNivo[nivo - 1]);
 }
 
 function promijeniBotun() {
-  console.log(document.getElementById("startStop").innerText);
-  let trenutniTekst = document.getElementById("startStop").innerText;
+  console.log(glavniBotun.innerText);
+  let trenutniTekst = glavniBotun.innerText;
   if (trenutniTekst == "Započni igru") {
-    document.getElementById("startStop").innerText = "Provjeri rezultat";
+    glavniBotun.innerText = "Igra u tijeku..";
+    glavniBotun.disabled = true;
 
     brojacVremena = setInterval(odbrojavaj, 1000);
   } else if (trenutniTekst == "Provjeri rezultat") {
     provjeriRezultat();
-    document.getElementById("startStop").innerText =
+    glavniBotun.innerText =
       "Započni 2. nivo/pokušaj ponovno/itd ovosno o provjeri";
   }
 }
@@ -118,7 +126,7 @@ function gameOver() {
   if (generiraniKrugovi.length === provjeriRezultat().length) {
     console.log("svi su krugovi u kvadratima");
     generiraniKrugovi = generiraniKrugovi.splice(0, generiraniKrugovi.length);
-
+    glavniBotun.disabled = false;
     zapocniIgru();
   }
 }
@@ -188,3 +196,12 @@ function closeDragFix(e) {
   ovaj.onmousemove = null;
   ovaj.onmouseup = null;
 }
+
+function ocistiKrugove() {
+  nivo += 1 ? nivo < 10 : (nivoId.innerText = "1");
+  nivoId.innerText = nivo;
+  let bubbles = document.querySelectorAll("#bubble");
+  return bubbles.forEach((bubble) => bubble.remove());
+}
+
+function promijeniNivo() {}
