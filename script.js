@@ -2,17 +2,19 @@ var nivo = 0;
 var nivoId = document.querySelector("#nivo");
 nivoId.innerText = nivo;
 var maxNivo = 10;
-var brojKrugovaNivo = [6, 10, 12, 14, 16, 18, 20, 22, 24, 26];
+var brojKrugovaNivo = [3, 10, 12, 14, 16, 18, 20, 22, 24, 26];
 let vrijemeNivo = []; //dat ćemo neko razumno vrijeme za svaki level
 brojKrugovaNivo.forEach((vrijeme) => {
   vrijemeNivo.push(vrijeme * 2);
 });
 console.log(vrijemeNivo);
+let trenutnoVrijeme;
 var boje = ["red", "blue", "green", "yellow"];
 var generiraniKrugovi = [];
 var randBoja, novi;
 var pozicijaKlikaZaDrag = [];
 var brojacVremena;
+let objave = document.querySelector("#objava");
 let glavniBotun = document.getElementById("startStop");
 let crveniDimenzije = document.querySelector("#prvi").getBoundingClientRect();
 let plavi = document.querySelector("#drugi").getBoundingClientRect();
@@ -32,13 +34,12 @@ function promijeniBotun() {
   let trenutniTekst = glavniBotun.innerText;
   if (trenutniTekst == "Započni igru") {
     glavniBotun.innerText = "Igra u tijeku..";
+    objave.innerText = "Igra počela..";
     glavniBotun.disabled = true;
 
     brojacVremena = setInterval(odbrojavaj, 1000);
-  } else if (trenutniTekst == "Provjeri rezultat") {
-    provjeriRezultat();
-    glavniBotun.innerText =
-      "Započni 2. nivo/pokušaj ponovno/itd ovosno o provjeri";
+  } else if (trenutniTekst == "Igra u tijeku..") {
+    // brojacVremena = setInterval(odbrojavaj, 1000);
   }
 }
 
@@ -72,7 +73,7 @@ function generirajKrugoveNaRandomMjestima(brojKrugova) {
   }
 }
 
-function provjeriRezultat() {
+function zbrojiUspjesneKrugove() {
   /*
   stvori novu listu krugova
   filtriraj postojecu listu prema:
@@ -122,25 +123,37 @@ function provjeriRezultat() {
   });
   return novikrugovi;
 }
-function gameOver() {
-  if (generiraniKrugovi.length === provjeriRezultat().length) {
-    console.log("svi su krugovi u kvadratima");
+function pratiRezultat() {
+  if (generiraniKrugovi.length === zbrojiUspjesneKrugove().length) {
+    objave.innerText = "svi su krugovi u kvadratima! Kreće slijedeći level..";
+    // alert("svi su krugovi u kvadratima! Kreće slijedeći level..");
     generiraniKrugovi = generiraniKrugovi.splice(0, generiraniKrugovi.length);
-    glavniBotun.disabled = false;
+
     zapocniIgru();
   }
 }
 
 function odbrojavaj() {
   let trenutnoVrijeme = parseInt(document.getElementById("vrijeme").innerHTML);
+  // let trenutnoVrijeme = vrijemeNivo[nivo];
   trenutnoVrijeme--;
   document.getElementById("vrijeme").innerHTML = trenutnoVrijeme;
+
+  console.log(trenutnoVrijeme);
   if (trenutnoVrijeme == 0) {
-    gameOver();
-    clearInterval(brojacVremena);
-    gameOver(); //napravite funkciju
-    provjeriRezultat();
-    // alert("Kraj igre, isteklo vrijeme");
+    pratiRezultat();
+    // clearInterval(brojacVremena); //napravite funkciju
+    objave.innerText = "Kraj igre, isteklo vrijeme, pokušaj ponovo..";
+    ocistiKrugove();
+    clearInterval(brojacVremena); //napravite funkcijun
+    nivoId.innerText = "1";
+    nivo = 0;
+    trenutnoVrijeme += parseInt(document.getElementById("vrijeme").innerHTML);
+    glavniBotun.innerText = "Započni igru";
+    glavniBotun.disabled = false;
+  } else {
+    pratiRezultat();
+    // trenutnoVrijeme += 10;
   }
 }
 
@@ -203,5 +216,3 @@ function ocistiKrugove() {
   let bubbles = document.querySelectorAll("#bubble");
   return bubbles.forEach((bubble) => bubble.remove());
 }
-
-function promijeniNivo() {}
