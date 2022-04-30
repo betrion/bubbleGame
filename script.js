@@ -7,7 +7,7 @@ var brojKrugovaNivo = [2, 4, 3, 3, 3, 3, 3, 3, 3, 3];
 let vrijemeNivo = []; //dat ćemo neko razumno vrijeme za svaki level
 vrijemeNivo.push(
   brojKrugovaNivo.forEach((vrijeme) => {
-    vrijemeNivo.push(Math.round(vrijeme * 10.5));
+    vrijemeNivo.push(Math.round(vrijeme * 1.5));
   })
 );
 document.getElementById("vrijeme").innerHTML = vrijemeNivo[nivo]; //postavi prvo vrijeme
@@ -17,17 +17,18 @@ var generiraniKrugovi = [];
 var randBoja, novi;
 var pozicijaKlikaZaDrag = [];
 var brojacVremena;
-let pokreniInterval;
 let objave = document.querySelector("#objava");
 let glavniBotun = document.getElementById("startStop");
-let crveniDimenzije = document.querySelector("#prvi").getBoundingClientRect();
+let nastaviBotun = document.getElementById("nastavi");
+
+let crveni = document.querySelector("#prvi").getBoundingClientRect();
 let plavi = document.querySelector("#drugi").getBoundingClientRect();
 let zeleni = document.querySelector("#treci").getBoundingClientRect();
 let zuti = document.querySelector("#cetvrti").getBoundingClientRect();
 
 function zapocniIgru() {
   promijeniBotun();
-  pokreniInterval = setInterval(odbrojavaj, 1000);
+  mjerac = pokreniInterval();
   generirajKrugoveNaRandomMjestima(brojKrugovaNivo[nivo - 1]);
 }
 // clearInterval(pokreniInterval);
@@ -37,10 +38,10 @@ function zapocniIgru() {
 function nastaviIgru() {
   ocistiKrugove();
   inkrementirajLevel();
-
+  clearInterval(pokreniInterval);
   generirajKrugoveNaRandomMjestima(brojKrugovaNivo[nivo - 1]);
   console.log(vrijemeNivo[nivo], "trenuntovrijem");
-  // brojacVremena = setInterval(odbrojavaj, 1000);
+  brojacVremena = setInterval(odbrojavaj, 1000);
 }
 
 function promijeniBotun() {
@@ -49,18 +50,20 @@ function promijeniBotun() {
     glavniBotun.innerText = "Igra u tijeku..";
     objave.innerText = "Igra počela..";
     glavniBotun.disabled = true;
+    nastaviBotun.disabled = false;
     // brojacVremena = pokreniInterval();
     // brojacVremena = setInterval(odbrojavaj, 1000);
     // } else if (trenutniTekst == "Igra u tijeku..") {
     // brojacVremena = setInterval(odbrojavaj, 1000);
   }
 }
-// function pokreniInterval() {
-//   return setInterval(odbrojavaj, 1000);
-// }
-// function zaustaviInterval() {
-//   return clearInterval();
-// }
+function pokreniInterval() {
+  let brojac = setInterval(odbrojavaj, 1000);
+  return brojac;
+}
+function zaustaviInterval(interval) {
+  return clearInterval(interval);
+}
 function generirajKrugoveNaRandomMjestima(brojKrugova) {
   console.log(`Generirano je ${brojKrugova} krugova`);
   for (var i = 0; i < brojKrugova; i++) {
@@ -103,10 +106,10 @@ function zbrojiUspjesneKrugove() {
   generiraniKrugovi.forEach((krug) => {
     if (krug.style.backgroundColor === "red") {
       if (
-        krug.getBoundingClientRect().x > crveniDimenzije.left &&
-        krug.getBoundingClientRect().x + 60 < crveniDimenzije.right &&
-        krug.getBoundingClientRect().y > crveniDimenzije.top &&
-        krug.getBoundingClientRect().y + 60 < crveniDimenzije.bottom
+        krug.getBoundingClientRect().x > crveni.left &&
+        krug.getBoundingClientRect().x + 60 < crveni.right &&
+        krug.getBoundingClientRect().y > crveni.top &&
+        krug.getBoundingClientRect().y + 60 < crveni.bottom
       ) {
         novikrugovi.push(krug);
       }
@@ -146,9 +149,13 @@ function pratiRezultat() {
   if (generiraniKrugovi.length === zbrojiUspjesneKrugove().length) {
     objave.innerText = "svi su krugovi u kvadratima! Kreće slijedeći level..";
     // alert("svi su krugovi u kvadratima! Kreće slijedeći level..");
-    generiraniKrugovi = generiraniKrugovi.splice(0, generiraniKrugovi.length);
-    clearInterval(pokreniInterval);
-    nastaviIgru();
+    generiraniKrugovi = generiraniKrugovi.splice(
+      0,
+      generiraniKrugovi.lastIndexOf
+    );
+    console.log(generiraniKrugovi, "kruciii");
+    return generiraniKrugovi; //ako ovo vrati nulu nastavi dalje
+    // nastaviIgru();
   }
 }
 
@@ -164,9 +171,9 @@ function odbrojavaj() {
     pratiRezultat();
     objave.innerText = "Kraj igre, isteklo vrijeme, pokušaj ponovo..";
     ocistiKrugove();
-    clearInterval(pokreniInterval);
+    zaustaviInterval(mjerac);
     nivoId.innerText = "1";
-    nivo = 0;
+    nivo = 1;
     trenutnoVrijeme = 20;
     document.getElementById("vrijeme").innerHTML = vrijemeNivo[nivo];
     glavniBotun.innerText = "Započni igru";
