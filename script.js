@@ -148,6 +148,7 @@ function gameOver() {
   nivo = 1;
   nivoId.innerText = nivo;
   document.getElementById("vrijeme").innerHTML = vrijemeNivo[nivo - 1];
+  glavniBotun.disabled = false;
 }
 function presaGejm() {
   //isti k ka gameover samo drugi tekst haha
