@@ -3,7 +3,8 @@ var nivoId = document.querySelector("#nivo");
 nivoId.innerText = nivo;
 // var maxNivo = 10;  //nepotrebno
 // var brojKrugovaNivo = [3, 10, 12, 14, 16, 18, 20, 22, 24, 26];
-var brojKrugovaNivo = [3, 6, 9, 12, 14, 16, 18, 20, 22, 24];
+var brojKrugovaNivo = [2, 3, 4, 5, 6, 7, 8, 9, 10, 12];
+// var brojKrugovaNivo = [1, 2, 2];
 let vrijemeNivo = []; //dat ćemo neko razumno vrijeme za svaki level
 vrijemeNivo.push(
   brojKrugovaNivo.forEach((vrijeme) => {
@@ -51,9 +52,6 @@ function promijeniBotun() {
     objave.innerText = "Igra počela..";
     glavniBotun.disabled = true;
     // nastaviBotun.disabled = false;
-  } else if (trenutniTekst == "Igra u tijeku.." && glavniBotun.disabled) {
-    glavniBotun.innerText = "Započni igru";
-    glavniBotun.disabled = false;
   }
 }
 
@@ -151,6 +149,15 @@ function gameOver() {
   nivoId.innerText = nivo;
   document.getElementById("vrijeme").innerHTML = vrijemeNivo[nivo - 1];
 }
+function presaGejm() {
+  //isti k ka gameover samo drugi tekst haha
+  objave.innerText = "GOTOV GEJM SVE SI PREŠA AJ ĆA MOĆAN";
+  ocistiKrugove();
+  zaustaviInterval(mjerac);
+  nivo = 1;
+  nivoId.innerText = nivo;
+  document.getElementById("vrijeme").innerHTML = vrijemeNivo[nivo - 1];
+}
 function odbrojavaj() {
   let trenutnoVrijeme = parseInt(document.getElementById("vrijeme").innerHTML);
   trenutnoVrijeme--;
@@ -164,7 +171,9 @@ function odbrojavaj() {
     promijeniBotun();
   } else {
     //aktivno prati stanje krugova i reagiraj na promjenu levela
-    if (pratiRezultat()) {
+    if (pratiRezultat() && nivo == brojKrugovaNivo.length) {
+      presaGejm();
+    } else if (pratiRezultat()) {
       nastaviIgru();
     }
   }
@@ -184,6 +193,9 @@ function inkrementirajLevel() {
   console.log("nivo je", nivo);
   nivoId.innerText = nivo;
   console.log("nivoid ", nivoId.innerText);
+  if (nivo === 10 && nivoId.innerText == nivo) {
+    presaGejm();
+  }
 }
 function pokreniInterval() {
   let brojac = setInterval(odbrojavaj, 1000);
